@@ -22,14 +22,25 @@ merged = selector(delineated, commentFree)
 resources = re.compile("((?<=FROM )\w+|(?<=JOIN )\w+)", flags=re.IGNORECASE)
 match1 = [ resources.findall(x) for x in merged]
 match1 = [x[0] for x in match1 if x != [] ]
+match1 = list(set(match1)) #remove duplicates
+match1.sort() #alphabatize
 
 tempTable = re.compile("(?<=TEMP TABLE )\w+", flags=re.IGNORECASE)
 match2 = [ tempTable.findall(x) for x in merged]
 match2 = [x[0] for x in match2 if x != [] ]
+match2 = list(set(match2))
+match2.sort()
+
+#checks items that are aliased. used to discard more false positives
+alias = re.compile("(?<=AS )\w+", flags=re.IGNORECASE)
+match3 = [ alias.findall(x) for x in merged]
+match3 = [x[0] for x in match3 if x != [] ]
+match3 = list(set(match3))
+match3.sort()
 
 print("Resources Used: ", end="")
 for i, x in enumerate(match1):
-        if x not in match2:
+        if x not in match2 and x not in match3:
                 if i:
                         print(", ", end='')
                 print(x, end="")
