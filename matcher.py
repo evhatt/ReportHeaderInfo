@@ -19,9 +19,11 @@ commentFree = [nocomment.findall(x) for x in delineated ]
 merged = selector(delineated, commentFree)
 
 #compile the regular expressions and use list comprehension to iterate and match
-resources = re.compile("((?<=FROM )\w+|(?<=JOIN )\w+)", flags=re.IGNORECASE)
+resources = re.compile("(from|join) \w+\.(\w+)", flags=re.IGNORECASE)
+#print([ resources.findall(x) for x in merged])
 match1 = [ resources.findall(x) for x in merged]
-match1 = [x[0] for x in match1 if x != [] ]
+match1 = [x[0][1] for x in match1 if x != [] ] #grab captured table name
+match1 = [x for x in match1 if x != ''] #remove nulls
 match1 = list(set(match1)) #remove duplicates
 match1.sort() #alphabatize
 
@@ -32,15 +34,15 @@ match2 = list(set(match2))
 match2.sort()
 
 #checks items that are aliased. used to discard more false positives
-alias = re.compile("(?<=AS )\w+", flags=re.IGNORECASE)
-match3 = [ alias.findall(x) for x in merged]
-match3 = [x[0] for x in match3 if x != [] ]
-match3 = list(set(match3))
-match3.sort()
+#alias = re.compile("(?<=AS )\w+", flags=re.IGNORECASE)
+#match3 = [ alias.findall(x) for x in merged]
+#match3 = [x[0] for x in match3 if x != [] ]
+#match3 = list(set(match3))
+#match3.sort()
 
 print("Resources Used: ", end="")
 for i, x in enumerate(match1):
-        if x not in match2 and x not in match3:
+        if x not in match2:
                 if i:
                         print(", ", end='')
                 print(x, end="")
